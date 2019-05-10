@@ -42,7 +42,7 @@ void loop()
   server.handleClient();
 }
 
-const char* indexKeyProcessor(const String& key)
+String indexKeyProcessor(const String& key)
 {
   if (key == "TITLE") return "Hello World!";
   else if (key == "VAR1") return "It works!";
