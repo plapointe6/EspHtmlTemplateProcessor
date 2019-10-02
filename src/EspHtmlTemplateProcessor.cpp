@@ -50,7 +50,7 @@ bool EspHtmlTemplateProcessor::processAndSend(const String& filePath, GetKeyValu
         index++;
       }
 
-      // Wen we encounter two opening curly braces, it a template syntax that we must handle
+      // When we encounter two opening curly braces, it's a template syntax that we must handle
       if (index >= 3 && buffer[index - 2] == OPENING_CURLY_BRACKET_CHAR && buffer[index - 3] == OPENING_CURLY_BRACKET_CHAR)
       {
         // if the last char is an escape char, remove it form the template and don't do the substitution
@@ -60,15 +60,16 @@ bool EspHtmlTemplateProcessor::processAndSend(const String& filePath, GetKeyValu
         }
         else
         {
-          // if the buffer contain more than the last 3 chars, clear it omitting the last 3 chars 
+          // if the buffer contain more than the last 3 chars, send it's content omitting the last 3 chars 
           if (index > 3)
           {
             buffer[index - 3] = '\0';
             mServer->sendContent(buffer);
-            // Set the first char of the key into the buffer as it was not an escape char
-            buffer[0] = ch;
-            index = 1;
           }
+		  
+          // Set the first char of the key into the buffer as it was not an escape char
+          buffer[0] = ch;
+          index = 1;
 
           // Extract the key for substitution
           bool found = false;
