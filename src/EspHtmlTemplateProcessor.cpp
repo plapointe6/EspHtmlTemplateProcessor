@@ -97,7 +97,9 @@ bool EspHtmlTemplateProcessor::processAndSend(const String& filePath, GetKeyValu
 
           // Get key value
           buffer[index] = '\0';
-          mServer->sendContent(getKeyValueCallback(buffer));
+          String value = getKeyValueCallback(buffer);
+          if(value.length() > 0)
+            mServer->sendContent(value);
           index = 0;
         }
       }
