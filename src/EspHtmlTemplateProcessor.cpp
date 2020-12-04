@@ -3,8 +3,15 @@
 EspHtmlTemplateProcessor::EspHtmlTemplateProcessor(WebServer* server) : mServer(server) {}
 EspHtmlTemplateProcessor::~EspHtmlTemplateProcessor() {}
 
+bool EspHtmlTemplateProcessor::processAndSend(
+    const String& filePath, GetKeyValueCallback getKeyValueCallback) 
+{
+  ContentItem content[0];
+  return this->processAndSend(filePath, getKeyValueCallback, content, 0);
+}
 
-bool EspHtmlTemplateProcessor::processAndSend(const String& filePath, GetKeyValueCallback getKeyValueCallback)
+bool EspHtmlTemplateProcessor::processAndSend(const String& filePath, GetKeyValueCallback getKeyValueCallback,
+    ContentItem* content, int contentSize) 
 {
   // Opening the file
   FileReader reader;
@@ -66,7 +73,7 @@ bool EspHtmlTemplateProcessor::processAndSend(const String& filePath, GetKeyValu
             buffer[index - 3] = '\0';
             mServer->sendContent(buffer);
           }
-		  
+
           // Set the first char of the key into the buffer as it was not an escape char
           buffer[0] = ch;
           index = 1;
@@ -97,9 +104,29 @@ bool EspHtmlTemplateProcessor::processAndSend(const String& filePath, GetKeyValu
 
           // Get key value
           buffer[index] = '\0';
-          String value = getKeyValueCallback(buffer);
-          if(value.length() > 0)
-            mServer->sendContent(value);
+          bool foundInContentArr = false;
+
+          //  First check to see if the key was passed in the content array
+          if (content)
+          {
+            for (int i = 0; i < contentSize; i++)
+            {
+              if (content[i].key.equals(buffer) && content[i].value.length() > 0) 
+              {
+                foundInContentArr = true;
+                mServer->sendContent(content[i].value);
+              }
+            }
+          }
+
+          // Get content from callback if not passed in the content array
+          if (!foundInContentArr)
+          {
+            String value = getKeyValueCallback(buffer);
+            if (value.length() > 0)
+              mServer->sendContent(value);
+          }
+
           index = 0;
         }
       }

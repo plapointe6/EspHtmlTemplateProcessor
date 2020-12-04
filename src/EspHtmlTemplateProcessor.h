@@ -15,7 +15,14 @@
 #define ESCAPE_CHAR 92 // char: '\'
 #define BUFFER_SIZE 100 // Buffer size for file reading
 
-typedef String (*const GetKeyValueCallback) (const String& key);
+struct ContentItem
+{
+  String key;
+  String value;
+};
+typedef struct ContentItem ContentItem;
+
+typedef String (*const GetKeyValueCallback)(const String& key);
 
 class EspHtmlTemplateProcessor
 {
@@ -27,6 +34,9 @@ public:
   ~EspHtmlTemplateProcessor();
 
   bool processAndSend(const String& filePath, GetKeyValueCallback getKeyValueCallback);
+
+  bool processAndSend(const String& filePath, GetKeyValueCallback getKeyValueCallback,
+                      ContentItem* content, int contentSize);
 
 private:
   void sendError(const String& errorDescription) const;
